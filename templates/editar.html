@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Editar {{ producto.nombre }}
+{% endblock %}
+
+{% block content %}
+
+<a
+    href="{{ url_for('detalle_producto', producto_id=producto.id) }}"
+    class="btn btn-outline-secondary mb-3">
+
+    ← Cancelar
+
+</a>
+
+
+<div class="card">
+
+    <div class="card-body">
+
+        <h2 class="mb-4">
+            ✏️ Editar Producto
+        </h2>
+
+        <p class="text-muted">
+
+            <span class="badge bg-secondary">
+                {{ producto.tipo }}
+            </span>
+
+            Código: {{ producto.codigo }}
+
+        </p>
+
+
+        <form method="POST">
+
+            <!-- Nombre -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Nombre
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    name="nombre"
+                    value="{{ producto.nombre }}"
+                    required>
+
+            </div>
+
+
+            <!-- Precio -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Precio base ($)
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    name="precio_base"
+                    value="{{ producto.precio_base }}"
+                    required>
+
+            </div>
+
+
+            <!-- Stock -->
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Stock
+                </label>
+
+                <input
+                    type="number"
+                    class="form-control"
+                    name="stock"
+                    value="{{ producto.stock }}"
+                    required>
+
+            </div>
+
+
+            <div class="alert alert-info">
+
+                Los campos específicos del tipo de producto
+                no se editan en esta versión.
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+
+                Guardar cambios
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
