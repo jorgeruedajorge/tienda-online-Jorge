@@ -1,3 +1,86 @@
+import os
+import uuid
+
+from pathlib import Path
+
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "webp"
+}
+
+
+def extension_permitida(nombre):
+
+    return (
+        "." in nombre
+        and nombre.rsplit(".", 1)[1].lower()
+        in ALLOWED_EXTENSIONS
+    )
+
+
+def guardar_imagen(archivo):
+
+    if not archivo or not archivo.filename:
+        return None
+
+    if not extension_permitida(archivo.filename):
+        raise ValueError(
+            "Formato de imagen no permitido."
+        )
+
+    nombre_seguro = secure_filename(
+        archivo.filename
+    )
+
+    extension = nombre_seguro.rsplit(
+        ".",
+        1
+    )[1].lower()
+
+    nombre_unico = (
+        f"{uuid.uuid4().hex}.{extension}"
+    )
+
+    carpeta = os.path.join(
+        app.root_path,
+        "static",
+        "uploads"
+    )
+
+    os.makedirs(
+        carpeta,
+        exist_ok=True
+    )
+
+    archivo.save(
+        os.path.join(
+            carpeta,
+            nombre_unico
+        )
+    )
+
+    return nombre_unico
+
+
+def eliminar_imagen(nombre):
+
+    if not nombre:
+        return
+
+    ruta = os.path.join(
+        app.config["UPLOAD_FOLDER"],
+        nombre
+    )
+
+    if os.path.isfile(ruta):
+        os.remove(ruta)
+
+
 from flask import (
     Flask,
     render_template,
@@ -31,6 +114,23 @@ from auth import login_requerido, rol_requerido
 app = Flask(__name__)
 
 app.config.from_object(Config)
+
+# Carpeta donde se guardan las imágenes de los productos
+UPLOAD_FOLDER = Path(
+    app.root_path,
+    "static",
+    "uploads"
+)
+
+UPLOAD_FOLDER.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
+
+# Límite de tamaño de archivo: 4 MB
+app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024
 
 db.init_app(app)
 
@@ -87,28 +187,8 @@ def detalle_producto(producto_id):
     "/productos/<int:producto_id>/editar",
     methods=["GET", "POST"]
 )
+@rol_requerido("admin")
 def editar_producto(producto_id):
-
-    # --------------------------------------
-    # PROTECCIÓN ADMIN
-    # --------------------------------------
-
-    @app.route(
-        "/productos/<int:producto_id>/editar",
-        methods=["GET", "POST"]
-    )
-    @rol_requerido("admin")
-    def editar_producto(producto_id):
-
-        flash(
-            "Solo los administradores pueden editar productos.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("inicio")
-        )
-
 
     # --------------------------------------
     # BUSCAR PRODUCTO
@@ -143,6 +223,26 @@ def editar_producto(producto_id):
                 ]
             )
 
+            # --------------------------------------
+            # ACTUALIZAR IMAGEN (OPCIONAL)
+            # --------------------------------------
+
+            archivo = request.files.get("imagen")
+
+            if archivo and archivo.filename:
+
+                nueva_imagen = guardar_imagen(
+                    archivo
+                )
+
+                # Eliminar la imagen anterior si existe
+                if producto.imagen:
+                    eliminar_imagen(
+                        producto.imagen
+                    )
+
+                producto.imagen = nueva_imagen
+
             db.session.commit()
 
             flash(
@@ -157,11 +257,18 @@ def editar_producto(producto_id):
                 )
             )
 
-        except ValueError:
+        except ValueError as e:
 
-            return (
-                "Revisa que el precio y el stock sean válidos.",
-                400
+            flash(
+                str(e),
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "editar_producto",
+                    producto_id=producto.id
+                )
             )
 
 
@@ -184,28 +291,8 @@ def editar_producto(producto_id):
     "/productos/<int:producto_id>/desactivar",
     methods=["POST"]
 )
+@rol_requerido("admin")
 def desactivar_producto(producto_id):
-
-    # --------------------------------------
-    # PROTECCIÓN ADMIN
-    # --------------------------------------
-
-    @app.route(
-        "/productos/<int:producto_id>/desactivar",
-        methods=["POST"]
-    )
-    @rol_requerido("admin")
-    def desactivar_producto(producto_id):
-
-        flash(
-            "Solo los administradores pueden desactivar productos.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("inicio")
-        )
-
 
     # --------------------------------------
     # BUSCAR PRODUCTO
@@ -243,28 +330,8 @@ def desactivar_producto(producto_id):
     "/producto/nuevo",
     methods=["GET", "POST"]
 )
+@rol_requerido("admin")
 def nuevo_producto():
-
-    # --------------------------------------
-    # PROTECCIÓN ADMIN
-    # --------------------------------------
-
-    @app.route(
-        "/producto/nuevo",
-        methods=["GET", "POST"]
-    )
-    @rol_requerido("admin")
-    def nuevo_producto():
-
-        flash(
-            "Solo los administradores pueden agregar productos.",
-            "danger"
-        )
-
-        return redirect(
-            url_for("inicio")
-        )
-
 
     # --------------------------------------
     # MOSTRAR FORMULARIO
@@ -446,6 +513,34 @@ def nuevo_producto():
 
         flash(
             "Tipo de producto no válido.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("nuevo_producto")
+        )
+
+
+    # ======================================
+    # RECIBIR Y GUARDAR IMAGEN
+    # ======================================
+
+    try:
+
+        archivo = request.files.get(
+            "imagen"
+        )
+
+        if archivo and archivo.filename:
+
+            producto.imagen = guardar_imagen(
+                archivo
+            )
+
+    except ValueError as e:
+
+        flash(
+            str(e),
             "danger"
         )
 

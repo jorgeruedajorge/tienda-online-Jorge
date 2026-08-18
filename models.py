@@ -160,6 +160,11 @@ class Producto(db.Model):
         db.String(30)
     )
 
+    imagen = db.Column(
+    db.String(255),
+    nullable=True
+    )
+
 
     # ======================================
     # HERENCIA

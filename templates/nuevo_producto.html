@@ -6,171 +6,242 @@ Nuevo Producto
 
 {% block content %}
 
-<h1 class="mb-4">
-    Agregar Producto
-</h1>
+<div class="container">
 
-<form method="POST">
+    <h1 class="mb-4 page-title">
+        Agregar Producto
+    </h1>
 
-    <div class="mb-3">
-        <label class="form-label">
-            Tipo de producto
-        </label>
+    <div class="card form-card shadow-sm p-3 p-md-4 mb-4">
+<form
+        method="POST"
+        enctype="multipart/form-data"
+    >
 
-        <select
-            name="tipo"
-            class="form-select"
-            required>
+        <!-- Tipo de producto -->
+        <div class="mb-3">
 
-            <option value="fisico">
-                Físico
-            </option>
+            <label class="form-label">
+                Tipo de producto
+            </label>
 
-            <option value="digital">
-                Digital
-            </option>
+            <select
+                name="tipo"
+                class="form-select"
+                required>
 
-            <option value="perecible">
-                Perecible
-            </option>
+                <option value="fisico">
+                    Físico
+                </option>
 
-        </select>
-    </div>
+                <option value="digital">
+                    Digital
+                </option>
 
+                <option value="perecible">
+                    Perecible
+                </option>
 
-    <div class="mb-3">
-        <label class="form-label">
-            Código
-        </label>
+            </select>
 
-        <input
-            type="text"
-            name="codigo"
-            class="form-control"
-            required>
-    </div>
+        </div>
 
 
-    <div class="mb-3">
-        <label class="form-label">
-            Nombre
-        </label>
+        <!-- Código -->
+        <div class="mb-3">
 
-        <input
-            type="text"
-            name="nombre"
-            class="form-control"
-            required>
-    </div>
+            <label class="form-label">
+                Código
+            </label>
 
+            <input
+                type="text"
+                name="codigo"
+                class="form-control"
+                placeholder="Ej. PER001"
+                required>
 
-    <div class="mb-3">
-        <label class="form-label">
-            Precio base
-        </label>
-
-        <input
-            type="number"
-            step="0.01"
-            name="precio_base"
-            class="form-control"
-            required>
-    </div>
+        </div>
 
 
-    <div class="mb-3">
-        <label class="form-label">
-            Stock
-        </label>
+        <!-- Nombre -->
+        <div class="mb-3">
 
-        <input
-            type="number"
-            name="stock"
-            class="form-control"
-            required>
-    </div>
+            <label class="form-label">
+                Nombre
+            </label>
 
+            <input
+                type="text"
+                name="nombre"
+                class="form-control"
+                placeholder="Nombre del producto"
+                required>
 
-    <div class="mb-3">
-        <label class="form-label">
-            Peso (kg)
-        </label>
-
-        <input
-            type="number"
-            step="0.01"
-            name="peso_kg"
-            class="form-control">
-    </div>
+        </div>
 
 
-    <div class="mb-3">
-        <label class="form-label">
-            Costo de envío por kg
-        </label>
+        <!-- Precio -->
+        <div class="mb-3">
 
-        <input
-            type="number"
-            step="0.01"
-            name="costo_envio_por_kg"
-            class="form-control">
-    </div>
+            <label class="form-label">
+                Precio base
+            </label>
 
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="precio_base"
+                class="form-control"
+                placeholder="0.00"
+                required>
 
-    <div class="mb-3">
-        <label class="form-label">
-            Licencia
-        </label>
-
-        <select
-            name="licencia"
-            class="form-select">
-
-            <option value="personal">
-                Personal
-            </option>
-
-            <option value="comercial">
-                Comercial
-            </option>
-
-            <option value="educativa">
-                Educativa
-            </option>
-
-        </select>
-    </div>
+        </div>
 
 
-    <div class="mb-3">
-        <label class="form-label">
-            Días para vencer
-        </label>
+        <!-- Stock -->
+        <div class="mb-3">
 
-        <input
-            type="number"
-            name="dias_para_vencer"
-            class="form-control">
-    </div>
+            <label class="form-label">
+                Stock
+            </label>
 
+            <input
+                type="number"
+                min="0"
+                name="stock"
+                class="form-control"
+                placeholder="Cantidad disponible"
+                required>
 
-    <button
-        type="submit"
-        class="btn btn-success">
-
-        Guardar producto
-
-    </button>
+        </div>
 
 
-    <a
-        href="{{ url_for('inicio') }}"
-        class="btn btn-secondary">
+        <!-- IMAGEN DEL PRODUCTO -->
+        <div class="mb-4">
 
-        Cancelar
+            <label class="form-label fw-bold">
+                Imagen del producto
+            </label>
 
-    </a>
+            <input
+                type="file"
+                name="imagen"
+                class="form-control"
+                accept=".png,.jpg,.jpeg,.gif,.webp"
+            >
 
-</form>
+            <div class="form-text">
+                Puedes subir una imagen en formato
+                PNG, JPG, JPEG, GIF o WEBP.
+            </div>
+
+        </div>
+
+
+        <!-- Peso -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Peso (kg)
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="peso_kg"
+                class="form-control">
+
+        </div>
+
+
+        <!-- Costo de envío -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Costo de envío por kg
+            </label>
+
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                name="costo_envio_por_kg"
+                class="form-control">
+
+        </div>
+
+
+        <!-- Licencia -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Licencia
+            </label>
+
+            <select
+                name="licencia"
+                class="form-select">
+
+                <option value="personal">
+                    Personal
+                </option>
+
+                <option value="comercial">
+                    Comercial
+                </option>
+
+                <option value="educativa">
+                    Educativa
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Días para vencer -->
+        <div class="mb-3">
+
+            <label class="form-label">
+                Días para vencer
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                name="dias_para_vencer"
+                class="form-control">
+
+        </div>
+
+
+        <!-- Botones -->
+        <div class="d-flex gap-2">
+
+            <button
+                type="submit"
+                class="btn btn-success">
+
+                🖼️ Guardar producto
+
+            </button>
+
+
+            <a
+                href="{{ url_for('inicio') }}"
+                class="btn btn-secondary">
+
+                Cancelar
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
 
 {% endblock %}
